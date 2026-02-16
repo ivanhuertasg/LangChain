@@ -58,6 +58,59 @@ def generate_quiz(topic: str, num_questions: int = 5) -> str:
     except Exception as e:
         return f"Error al generar el cuestionario: {str(e)}"
 
+def play_quiz(quiz_json: str) -> str:
+    """Play the quiz interactively with user"""
+    try:
+        import json
+        quiz_data = json.loads(quiz_json)
+        score = 0
+        total_questions = len(quiz_data)
+        
+        result = "📝 **Comenzando el cuestionario:**\n\n"
+        
+        for i, question in enumerate(quiz_data, 1):
+            result += f"❓ **Pregunta {i}/{total_questions}:** {question['pregunta']}\n"
+            result += "   A) " + question['opciones'][0] + "\n"
+            result += "   B) " + question['opciones'][1] + "\n"
+            result += "   C) " + question['opciones'][2] + "\n"
+            result += "   D) " + question['opciones'][3] + "\n\n"
+            
+            # Add user message to history
+            st.session_state.messages.append({"role": "user", "content": f"Respuesta a pregunta {i}"})
+            with st.chat_message("user"):
+                st.markdown(f"Respuesta a pregunta {i}")
+            
+            # Get user answer
+            user_answer = st.text_input(f"Introduce tu respuesta (A, B, C o D) para la pregunta {i}:", type="text")
+            
+            # Add bot response to history
+            st.session_state.messages.append({
+                "role": "assistant", 
+                "content": f"Respuesta correcta: {question['respuesta_correcta']}"
+            })
+            with st.chat_message("assistant"):
+                st.markdown(f"Respuesta correcta: {question['respuesta_correcta']}")
+            
+            # Check answer
+            correct_option = question['respuesta_correcta']
+            user_choice = user_answer.upper()
+            
+            if user_choice == correct_option[0]:
+                result += "✅ **Correcto!**\n\n"
+                score += 1
+            else:
+                result += f"❌ **Incorrecto.** La respuesta correcta era: {correct_option}\n\n"
+        
+        # Final score
+        result += f"📊 **Resultado final:** {score}/{total_questions} puntos\n"
+        result += f"   - Aciertos: {score}\n"
+        result += f"   - Fallos: {total_questions - score}\n"
+        result += f"   - Porcentaje: {int((score/total_questions)*100)}%\n\n"
+        
+        return result
+    except Exception as e:
+        return f"Error al jugar el cuestionario: {str(e)}"
+
 def main():
     # Page configuration
     st.set_page_config(
@@ -121,6 +174,17 @@ def main():
                     "role": "assistant", 
                     "content": f"📝 **Cuestionario sobre '{topic}':**\n\n{quiz_result}"
                 })
+                
+                # Play the quiz
+                with st.spinner("🎮 Jugando el cuestionario..."):
+                    quiz_result_interactive = play_quiz(quiz_result)
+                    st.markdown(quiz_result_interactive)
+                    
+                    # Add to history
+                    st.session_state.messages.append({
+                        "role": "assistant", 
+                        "content": f"🎮 **Resultados del cuestionario sobre '{topic}':**\n\n{quiz_result_interactive}"
+                    })
     
     # Sidebar with API key input and instructions
     with st.sidebar:
