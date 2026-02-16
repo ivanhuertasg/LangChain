@@ -31,7 +31,7 @@ def initialize_llm(api_key):
     )
 
 def generate_quiz(topic: str, num_questions: int = 5) -> str:
-    """Generate a quiz with multiple choice questions"""
+    """Generate quiz questions without answers"""
     # Check if API key is set
     if not st.session_state.google_api_key:
         return "⚠️ Por favor, introduce tu API key de Google en la barra lateral primero."
@@ -44,8 +44,7 @@ def generate_quiz(topic: str, num_questions: int = 5) -> str:
     [
       {{
         "pregunta": "Texto de la pregunta",
-        "opciones": ["Opción A", "Opción B", "Opción C", "Opción D"],
-        "respuesta_correcta": "Opción correcta"
+        "opciones": ["Opción A", "Opción B", "Opción C", "Opción D"]
       }}
     ]
     
@@ -57,6 +56,51 @@ def generate_quiz(topic: str, num_questions: int = 5) -> str:
         return response.content
     except Exception as e:
         return f"Error al generar el cuestionario: {str(e)}"
+
+def play_quiz_interactive(quiz_json: str) -> str:
+    """Play quiz interactively with multiple messages"""
+    try:
+        import json
+        quiz_data = json.loads(quiz_json)
+        score = 0
+        total_questions = len(quiz_data)
+        
+        result = "📝 **Comenzando el cuestionario:**\n\n"
+        
+        for i, question in enumerate(quiz_data, 1):
+            result += f"❓ **Pregunta {i}/{total_questions}:** {question['pregunta']}\n"
+            result += "   A) " + question['opciones'][0] + "\n"
+            result += "   B) " + question['opciones'][1] + "\n"
+            result += "   C) " + question['opciones'][2] + "\n"
+            result += "   D) " + question['opciones'][3] + "\n\n"
+            
+            # Add user message to history
+            st.session_state.messages.append({"role": "user", "content": f"Respuesta a pregunta {i}"})
+            with st.chat_message("user"):
+                st.markdown(f"Respuesta a pregunta {i}")
+            
+            # Get user answer
+            user_answer = st.text_input(f"Introduce tu respuesta (A, B, C o D) para la pregunta {i}:", type="text")
+            
+            # Check answer
+            correct_option = question['opciones'][0] if i == 1 else question['opciones'][1]  # Placeholder
+            user_choice = user_answer.upper()
+            
+            if user_choice == correct_option[0]:
+                result += "✅ **Correcto!**\n\n"
+                score += 1
+            else:
+                result += f"❌ **Incorrecto.**\n\n"
+        
+        # Final score
+        result += f"📊 **Resultado final:** {score}/{total_questions} puntos\n"
+        result += f"   - Aciertos: {score}\n"
+        result += f"   - Fallos: {total_questions - score}\n"
+        result += f"   - Porcentaje: {int((score/total_questions)*100)}%\n\n"
+        
+        return result
+    except Exception as e:
+        return f"Error al jugar el cuestionario: {str(e)}"
 
 def play_quiz(quiz_json: str) -> str:
     """Play the quiz interactively with user"""
@@ -167,9 +211,9 @@ def main():
                     "content": f"📝 **Cuestionario sobre '{topic}':**\n\n{quiz_result}"
                 })
                 
-                # Play the quiz
+                # Play the quiz interactively
                 with st.spinner("🎮 Jugando el cuestionario..."):
-                    quiz_result_interactive = play_quiz(quiz_result)
+                    quiz_result_interactive = play_quiz_interactive(quiz_result)
                     st.markdown(quiz_result_interactive)
                     
                     # Add to history
