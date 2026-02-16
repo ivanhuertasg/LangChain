@@ -157,11 +157,12 @@ def main():
                 else:
                     st.error(f"Incorrecto. La respuesta correcta era: {correct_option}")
                 
-                # Show current score
-                st.markdown(f"**Puntuacion actual: {st.session_state.score}/{current_idx + 1}**")
-                
-                # Move to next question
+                # Move to next question first
                 st.session_state.current_question += 1
+                
+                # Show current score
+                st.markdown(f"**Puntuacion actual: {st.session_state.score}/{st.session_state.current_question}**")
+                
                 st.rerun()
         else:
             # Show final results
