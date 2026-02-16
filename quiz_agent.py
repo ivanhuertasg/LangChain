@@ -83,14 +83,6 @@ def play_quiz(quiz_json: str) -> str:
             # Get user answer
             user_answer = st.text_input(f"Introduce tu respuesta (A, B, C o D) para la pregunta {i}:", type="text")
             
-            # Add bot response to history
-            st.session_state.messages.append({
-                "role": "assistant", 
-                "content": f"Respuesta correcta: {question['respuesta_correcta']}"
-            })
-            with st.chat_message("assistant"):
-                st.markdown(f"Respuesta correcta: {question['respuesta_correcta']}")
-            
             # Check answer
             correct_option = question['respuesta_correcta']
             user_choice = user_answer.upper()
