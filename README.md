@@ -1,8 +1,8 @@
-# 📚 Quiz Bot - Generador de Cuestionarios con IA
+# Quiz Bot - Generador de Cuestionarios con IA
 
 Un chatbot interactivo que genera cuestionarios sobre cualquier tema usando LangChain y Google Gemini.
 
-## 🚀 Cómo ejecutar localmente
+## Cómo ejecutar localmente
 
 ### 1. Instalar dependencias
 ```bash
@@ -15,7 +15,7 @@ Crea un archivo `.env` en la raíz del proyecto:
 GOOGLE_API_KEY=tu_api_key_aqui
 ```
 
-O puedes obtener una ключ gratuita en: https://aistudio.google.com/app/apikey
+O puedes obtener una clave gratuita en: https://aistudio.google.com/app/apikey
 
 ### 3. Ejecutar la aplicación
 ```bash
@@ -24,7 +24,7 @@ streamlit run quiz_agent.py
 
 La aplicación se abrirá en: http://localhost:8501
 
-## 🌐 Despliegue (Deploy)
+## Despliegue (Deploy)
 
 ### Opción 1: Streamlit Cloud (GRATIS)
 
@@ -54,13 +54,13 @@ La aplicación se abrirá en: http://localhost:8501
    - Build Command: `pip install -r requirements.txt`
    - Start Command: `streamlit run quiz_agent.py`
 
-## 📖 Cómo usar el Quiz Bot
+## Cómo usar el Quiz Bot
 
 1. Escribe un tema en el chat (ej: "Sistema Solar" o "Historia de España")
 2. El bot generará un cuestionario con preguntas de opción múltiple
 3. Cada pregunta incluye la respuesta correcta
 
-## 🔧 Características
+## Características
 
 - ✅ Interfaz de chatbot moderna
 - ✅ Genera cuestionarios en JSON
@@ -68,7 +68,7 @@ La aplicación se abrirá en: http://localhost:8501
 - ✅ Diseño responsivo
 - ✅ Despliegue gratuito en la nube
 
-## 📝 Notas
+## Notas
 
 - Necesitas una API key de Google Gemini (es gratuita)
 - El modelo usado es `gemini-2.0-flash`
