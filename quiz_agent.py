@@ -63,6 +63,9 @@ def generate_quiz(topic: str, num_questions: int = 5) -> str:
     if not st.session_state.google_api_key:
         return "Por favor, introduce tu API key de Google en la barra lateral primero."
     
+    import random
+    seed = random.randint(1, 1000)
+    
     prompt = f"""
 Genera un cuestionario sobre el tema: {topic}.
 Incluye {num_questions} preguntas de opcion multiple.
@@ -77,6 +80,7 @@ FORMATO OBLIGATORIO (solo JSON, sin texto adicional):
 ]
 
 Asegurate de que las preguntas sean claras y educativas.
+Usa semilla aleatoria {seed} para generar diferentes preguntas.
 Devuelve SOLO el JSON, sin texto adicional.
 """
     try:
@@ -127,12 +131,23 @@ def main():
                 correct_option = question['respuesta_correcta']
                 user_choice = user_answer.upper().strip()
                 
+                # Convert user choice (A, B, C, D) to expected format (Opcion A, Opcion B, etc.)
+                option_mapping = {
+                    'A': 'Opcion A',
+                    'B': 'Opcion B', 
+                    'C': 'Opcion C',
+                    'D': 'Opcion D'
+                }
+                
                 # Check if answer is correct
-                if user_choice == correct_option[0]:
+                if user_choice in option_mapping and option_mapping[user_choice] == correct_option:
                     st.session_state.score += 1
                     st.success("Correcto!")
                 else:
                     st.error(f"Incorrecto. La respuesta correcta era: {correct_option}")
+                
+                # Show current score
+                st.markdown(f"**Puntuacion actual: {st.session_state.score}/{current_idx + 1}**")
                 
                 # Move to next question
                 st.session_state.current_question += 1
@@ -154,6 +169,16 @@ def main():
                 st.markdown("Bien hecho!")
             else:
                 st.markdown("Sigue practicando!")
+            
+            # Show correct answers
+            st.markdown("### Respuestas Correctas:")
+            for i, question in enumerate(st.session_state.quiz_data, 1):
+                st.markdown(f"**Pregunta {i}:** {question['pregunta']}")
+                st.markdown(f"**Respuesta correcta:** {question['respuesta_correcta']}")
+                st.markdown(f"**Todas las opciones:**")
+                for j, opcion in enumerate(question['opciones'], 0):
+                    st.markdown(f"   - {opcion}")
+                st.markdown("---")
             
             if st.button("Nuevo Cuestionario"):
                 st.session_state.quiz_data = None
