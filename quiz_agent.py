@@ -131,16 +131,27 @@ def main():
                 correct_option = question['respuesta_correcta']
                 user_choice = user_answer.upper().strip()
                 
-                # Convert user choice (A, B, C, D) to expected format (Opcion A, Opcion B, etc.)
-                option_mapping = {
-                    'A': 'Opcion A',
-                    'B': 'Opcion B', 
-                    'C': 'Opcion C',
-                    'D': 'Opcion D'
-                }
+                # Check if answer is correct - try multiple possible formats
+                is_correct = False
                 
-                # Check if answer is correct
-                if user_choice in option_mapping and option_mapping[user_choice] == correct_option:
+                # Possible formats the correct answer might be in
+                possible_correct_formats = [
+                    f"Opcion {user_choice}",  # "Opcion A"
+                    user_choice,              # Just "A"
+                    f"{user_choice})",        # "A)"
+                    f"{user_choice}.",        # "A."
+                    f"({user_choice})",       # "(A)"
+                    f"opcion {user_choice.lower()}",  # "opcion a"
+                    f"Opcion {user_choice.lower()}"   # "Opcion a"
+                ]
+                
+                # Check if the correct_option matches any of our expected formats
+                for format_check in possible_correct_formats:
+                    if correct_option.strip().lower() == format_check.strip().lower():
+                        is_correct = True
+                        break
+                
+                if is_correct:
                     st.session_state.score += 1
                     st.success("Correcto!")
                 else:
